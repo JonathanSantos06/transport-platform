@@ -1,0 +1,46 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/orders_db}
+    username: ${SPRING_DATASOURCE_USERNAME:transport}
+    password: ${SPRING_DATASOURCE_PASSWORD:transport}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  structured:
+    format:
+      console: ecs
+  level:
+    com.transport.order: INFO
+
+services:
+  driver:
+    url: ${DRIVER_SERVICE_URL:http://localhost:8082}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-this-secret-key-for-local-development-only-123456789}
+
+

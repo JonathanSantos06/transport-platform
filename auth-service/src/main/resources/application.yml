@@ -1,0 +1,26 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/auth_db}
+    username: ${SPRING_DATASOURCE_USERNAME:transport}
+    password: ${SPRING_DATASOURCE_PASSWORD:transport}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+logging:
+  level:
+    com.transport.auth: INFO
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-this-secret-key-for-local-development-only-123456789}
+    expiration: 3600000

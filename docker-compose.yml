@@ -1,0 +1,87 @@
+services:
+
+  drivers-db:
+    image: postgres:17-alpine
+    container_name: transport-drivers-db
+    environment:
+      POSTGRES_DB: drivers_db
+      POSTGRES_USER: transport
+      POSTGRES_PASSWORD: transport
+    ports:
+      - "5434:5432"
+    volumes:
+      - drivers_data:/var/lib/postgresql/data
+
+  driver-service:
+    build:
+      context: ./driver-service
+    container_name: transport-driver-service
+    depends_on:
+      - drivers-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://drivers-db:5432/drivers_db
+      SPRING_DATASOURCE_USERNAME: transport
+      SPRING_DATASOURCE_PASSWORD: transport
+    ports:
+      - "8082:8082"
+
+  orders-db:
+    image: postgres:17-alpine
+    container_name: transport-orders-db
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: transport
+      POSTGRES_PASSWORD: transport
+    ports:
+      - "5435:5432"
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+
+  order-service:
+    build:
+      context: ./order-service
+    container_name: transport-order-service
+    depends_on:
+      - orders-db
+      - driver-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://orders-db:5432/orders_db
+      SPRING_DATASOURCE_USERNAME: transport
+      SPRING_DATASOURCE_PASSWORD: transport
+      DRIVER_SERVICE_URL: http://driver-service:8082
+      JWT_SECRET: change-this-secret-key-for-local-development-only-123456789
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./uploads:/app/uploads
+
+  auth-db:
+    image: postgres:17-alpine
+    container_name: transport-auth-db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: transport
+      POSTGRES_PASSWORD: transport
+    ports:
+      - "5436:5432"
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: transport-auth-service
+    depends_on:
+      - auth-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: transport
+      SPRING_DATASOURCE_PASSWORD: transport
+      JWT_SECRET: change-this-secret-key-for-local-development-only-123456789
+    ports:
+      - "8083:8083"
+
+volumes:
+  drivers_data:
+  orders_data:
+  auth_data:
